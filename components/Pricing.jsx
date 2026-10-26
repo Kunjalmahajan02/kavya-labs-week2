@@ -40,7 +40,7 @@ export default function Pricing() {
                 ))}
               </ul>
               <a
-                href="#get-started"
+                href="/login"
                 className={`mt-7 text-center font-semibold px-5 py-3 rounded-xl ${
                   plan.highlight ? "bg-brand-500 hover:bg-brand-600 text-white" : "border border-slate-300 hover:border-slate-400"
                 }`}

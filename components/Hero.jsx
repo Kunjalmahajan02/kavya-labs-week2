@@ -25,10 +25,10 @@ export default function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a
-              href="#get-started"
+              href="/login"
               className="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-brand-500/25"
             >
-              Get early access
+              Get started free
             </a>
             <a href="#how-it-works" className="border border-slate-300 hover:border-slate-400 font-semibold px-6 py-3 rounded-xl">
               See how it works

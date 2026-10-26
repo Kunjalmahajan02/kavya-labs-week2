@@ -1,43 +1,55 @@
-# Kavya Labs · Week 1: Landing page
+# Kavya Labs · Week 2: User authentication
 
-Landing page for **Kavya Labs**, a (fictional) Bengaluru AI startup, built for the Finlatics ANDP Virtual Startup simulator.
-**Kavya** is a multilingual AI assistant that answers customers on WhatsApp and the web in 12 Indian languages.
+Week 2 of the Kavya Labs build (Finlatics ANDP Virtual Startup simulator). It adds **user authentication with NextAuth.js and Google OAuth** on top of the Week 1 landing page.
 
-> Week 1 brief from the founder, Rohan Mehta: *Landing page with hero, features and footer.*
+> Week 2 brief from the founder, Rohan Mehta: *User authentication: NextAuth + Google OAuth.*
 
-## What's on the page
+## Features
 
-| Section | What it contains | File |
+| Feature | How it works | File |
 |---|---|---|
-| **Navbar** | Logo, section links, CTA, mobile hamburger menu | `components/Navbar.jsx` |
-| **Hero** | Headline, value proposition, two CTAs, key stats, and a WhatsApp-style chat mockup showing the product | `components/Hero.jsx` |
-| **Features** | Six feature cards (languages, channels, document training, orders and UPI, human handoff, insights) | `components/Features.jsx` |
-| **How it works** | Three-step onboarding | `components/HowItWorks.jsx` |
-| **Pricing** | Three plans in rupees, with the popular plan highlighted | `components/Pricing.jsx` |
-| **FAQ** | Expandable questions (native `<details>`, works without JavaScript) | `components/Faq.jsx` |
-| **Call to action** | Early-access banner | `components/CallToAction.jsx` |
-| **Footer** | Company info, link columns, contact email, copyright | `components/Footer.jsx` |
+| **NextAuth.js** | NextAuth v4 API route handling sign-in, callbacks, sessions and sign-out | `pages/api/auth/[...nextauth].js`, `lib/auth.js` |
+| **Google OAuth** | Google provider (OpenID Connect: `openid email profile`). Only Google accounts with a verified email are accepted | `lib/auth.js` |
+| **Custom sign-in page** | Branded `/login` page with a "Continue with Google" button and friendly error messages | `pages/login.js` |
+| **Protected routes** | NextAuth middleware redirects signed-out visitors from `/dashboard` to `/login?callbackUrl=/dashboard`; the page also checks the session on the server | `middleware.js`, `pages/dashboard.js` |
+| **Sessions** | Signed, encrypted JWT session cookie. `useSession` drives the navbar; `getServerSession` protects server-rendered pages | `pages/_app.js`, `components/Navbar.jsx` |
+| **User dashboard** | Profile photo, name, email, role, member-since date, last sign-in and total sign-ins, plus sign-out | `pages/dashboard.js` |
+| **Users saved to the database** | Every sign-in creates or updates the user in Postgres (Supabase) via Prisma: name, email, photo, role, login count, last login | `lib/auth.js`, `prisma/schema.prisma` |
+| **Roles** | Emails listed in `ADMIN_EMAILS` get the `admin` role, ready for the Week 3 admin dashboard | `lib/auth.js` |
+| **Session-aware navbar** | Signed out: "Sign in" and "Get started". Signed in: avatar, "Dashboard" and "Sign out" | `components/Navbar.jsx` |
 
-All copy lives in `lib/content.js`, so text changes don't touch the layout code.
+Everything from Week 1 (hero, features, how it works, pricing, FAQ, footer) is still on the home page.
 
-## Details
+## How to test it
 
-- **Responsive**: mobile-first layout, hamburger menu below 768px, tested at phone and desktop widths
-- **Accessible**: semantic landmarks (`header`, `nav`, `main`, `section`, `footer`), labelled menu button, keyboard-friendly FAQ
-- **SEO**: page title, meta description, Open Graph tags, SVG favicon
-- **Fast**: statically generated at build time, Inter font self-hosted via `next/font`
+**Without signing in** (as a reviewer):
+
+1. Open the live site. The navbar shows **Sign in** and **Get started**; the hero button "Get started free" goes to `/login`.
+2. Open **`/dashboard`**. You're redirected to **`/login?callbackUrl=%2Fdashboard`**, which shows the route is protected.
+3. On `/login`, **Continue with Google** sends you to Google's real OAuth consent screen.
+4. **`/api/auth/providers`** returns the configured Google provider as JSON.
+
+**With a Google account:** click **Continue with Google**, approve, and you land on `/dashboard` with your profile. The navbar switches to your avatar, and **Sign out** returns you to the home page.
+
+## Auth flow
+
+```
+/login ─► "Continue with Google" ─► Google consent ─► /api/auth/callback/google
+   ▲                                                         │
+   │ middleware redirect (signed out)                        ▼
+/dashboard ◄──── JWT session cookie ◄──── NextAuth: verify email, save user (Prisma), set role
+```
 
 ## Tech stack
 
-Next.js 14 (Pages Router) · React 18 · Tailwind CSS · Vercel
+Next.js 14 (Pages Router) · NextAuth.js v4 · Google OAuth 2.0 · Prisma · Supabase Postgres · Tailwind CSS · Vercel
 
-Next.js was chosen so the same codebase can grow into Week 2 (NextAuth + Google OAuth) and Week 3 (admin dashboard).
+## Setup
 
-## Run locally
+1. **Google OAuth client:** Google Cloud Console → APIs & Services → Credentials → Create credentials → OAuth client ID → Web application.
+   - Authorized JavaScript origin: `https://<your-app>.vercel.app`
+   - Authorized redirect URI: `https://<your-app>.vercel.app/api/auth/callback/google`
+2. Copy `.env.example` to `.env` (or add the same variables in Vercel) and fill in every value.
+3. `npm install`, then `npm run dev`.
 
-```
-npm install
-npm run dev
-```
-
-Open http://localhost:3000.
+Tables are created automatically on each build (`scripts/db-push.js`), inside a separate `kavya` Postgres schema so the database can be shared with other projects safely.

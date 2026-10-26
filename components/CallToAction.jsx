@@ -10,11 +10,8 @@ export default function CallToAction() {
             We're onboarding our first businesses in {COMPANY.city}. Get early access and a free setup call with our team.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a
-              href={`mailto:${COMPANY.email}?subject=Early%20access%20to%20Kavya`}
-              className="bg-white text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50"
-            >
-              Request early access
+            <a href="/login" className="bg-white text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50">
+              Create your account
             </a>
             <a href="#pricing" className="border border-white/60 font-semibold px-6 py-3 rounded-xl hover:bg-white/10">
               View pricing

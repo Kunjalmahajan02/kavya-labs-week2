@@ -5,17 +5,22 @@
   "description": "Kavya Labs: website and app for a Bengaluru AI startup (Finlatics ANDP simulator).",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "build": "prisma generate && node scripts/db-push.js && next build",
+    "start": "next start",
+    "db:push": "node scripts/db-push.js",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "next": "^14.2.15",
+    "next-auth": "^4.24.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
+    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.14"
   }
 }
